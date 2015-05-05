@@ -15,6 +15,13 @@ MODEL_FILE = caffe_root + 'models/bvlc_reference_caffenet/deploy.prototxt'
 PRETRAINED = caffe_root + 'models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel'
 IMAGE_FILE = '../images/IMG_2.jpg'
 
+def getPredictionClassNames():
+	classNames = []
+	with open(caffe_root + '/data/ilsvrc12/synset_words.txt', 'r') as f:
+		for line in f:
+			classNames.append(' '.join(line.strip().split(' ')[1:]))
+	return classNames
+
 caffe.set_mode_cpu()
 net = caffe.Classifier(MODEL_FILE, PRETRAINED,
                        mean=np.load(caffe_root + 'python/caffe/imagenet/ilsvrc_2012_mean.npy').mean(1).mean(1),
@@ -44,8 +51,12 @@ caffe_input = np.asarray([net.transformer.preprocess('data', in_) for in_ in inp
 
 caffe.set_mode_gpu()
 
+classNames = getPredictionClassNames()
+
 prediction = net.predict([input_image])
-print 'prediction shape:', prediction[0].shape
+entropy = -1 * np.multiply(prediction[0], np.log2(prediction[0])).sum()
 print 'predicted class:', prediction[0].argmax()
 print 'prediction probability:', prediction[0][prediction[0].argmax()]
 #plt.plot(prediction[0])
+print classNames[prediction[0].argmax()]
+print entropy
