@@ -31,9 +31,6 @@ classNames = getPredictionClassNames()
 
 for image_name in IMAGE_FILES:
 	input_image = caffe.io.load_image(image_name)
-	input_oversampled = caffe.io.oversample([caffe.io.resize_image(input_image, net.image_dims)], net.crop_dims)
-	caffe_input = np.asarray([net.transformer.preprocess('data', in_) for in_ in input_oversampled])
-	net.forward(data=caffe_input)
 
 	prediction = net.predict([input_image])
 	predictedClass = prediction[0].argmax()
