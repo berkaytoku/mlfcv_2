@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 # Make sure that caffe is on the python path:
 caffe_root = '../../caffe/'
@@ -26,17 +25,14 @@ net = caffe.Classifier(MODEL_FILE, PRETRAINED,
                        mean=np.load(caffe_root + 'python/caffe/imagenet/ilsvrc_2012_mean.npy').mean(1).mean(1),
                        channel_swap=(2,1,0),
                        raw_scale=255,
-                       image_dims=(256, 256))
+		       image_dims=(227,227))
 
 classNames = getPredictionClassNames()
 
 for image_name in IMAGE_FILES:
 	input_image = caffe.io.load_image(image_name)
-	# Resize the image to the standard (256, 256) and oversample net input sized crops.
 	input_oversampled = caffe.io.oversample([caffe.io.resize_image(input_image, net.image_dims)], net.crop_dims)
-	# 'data' is the input blob name in the model definition, so we preprocess for that input.
 	caffe_input = np.asarray([net.transformer.preprocess('data', in_) for in_ in input_oversampled])
-	# forward() takes keyword args for the input blobs with preprocessed input arrays.
 	net.forward(data=caffe_input)
 
 	prediction = net.predict([input_image])
@@ -46,6 +42,5 @@ for image_name in IMAGE_FILES:
 	print 'Image Name: ', image_name
 	print 'Predicted Class: ', predictedClass
 	print 'Prediction Probability: ', prediction[0][predictedClass]
-	#plt.plot(prediction[0])
 	print 'Predicted Class Name: ', classNames[predictedClass]
 	print 'Prediction Entropy: ', entropy
