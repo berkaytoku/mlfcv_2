@@ -1,3 +1,5 @@
+# Code snippets from http://nbviewer.ipython.org/github/BVLC/caffe/blob/master/examples/classification.ipynb are used in this project
+
 import numpy as np
 
 # Make sure that caffe is on the python path:
